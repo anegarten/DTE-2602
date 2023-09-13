@@ -52,30 +52,16 @@ def path_backtrack(start_node,end_node,came_from):
                     containing all nodes on the path taken from start to end     
     """
 
-    print(came_from)
+    path = []
 
+    current_node = end_node
 
-        
+    while current_node is not None:
+        path.append(current_node)
+        current_node = came_from[current_node]
+    
 
-graph = {"A": ["B", "C"],
-         "B": ["D"],
-         "C": ["E"]}
-
-graph2 = {(1, 1): [(2, 1), (1, 2)],
-          (1, 2): [(1, 1), (1, 3)],
-          (1, 3): [(1, 2), (2, 3), (1, 4)],
-          (1, 4): [(1, 3), (1, 5)],
-          (1, 5): [(1, 4), (2, 5)],
-          (2, 1): [(1, 1)],
-          (2, 3): [(3, 3), (1, 3)],
-          (2, 5): [(1, 5)],
-          (3, 3): [(3, 4), (2, 3)],
-          (3, 4): [(3, 3)]}
-
-
-came_from = breadth_first_traverse(graph2, (1,4))
-path_backtrack((1,3), (2,1), came_from[1,3])
-        
+    return path[::-1]
 
 
 def get_reachable_nodes(graph,start_node):
@@ -93,7 +79,13 @@ def get_reachable_nodes(graph,start_node):
     reachable_nodes:    A set (using set data type) of all the nodes
                         that are reachable from the start node.
     """
-    pass
+    came_from = breadth_first_traverse(graph, start_node)
+    nodes_discovered = set()
+    for key in came_from:
+        nodes_discovered.add(key)
+    
+    return nodes_discovered
+
 
 
 def breadth_first_search(graph,start_node,end_node):
@@ -119,5 +111,38 @@ def breadth_first_search(graph,start_node,end_node):
                 If the end node is not reachable from the start node,
                 path = None.
     """
-    
+
+    queue_frontier_search = []
+    came_from_search = {}
+
+    queue_frontier_search.append(start_node)
+    came_from_search[start_node] = None
+
+    while queue_frontier_search:
+        current_node = queue_frontier_search.pop(0)
+        if current_node == end_node:
+            break
+        for i in range(len(graph[current_node])):
+            if graph[current_node][i] not in came_from_search:
+                queue_frontier_search.append(graph[current_node][i])
+                came_from_search[graph[current_node][i]] = current_node
+
+    if current_node == end_node:
+        shortest_path = []
+        for key in came_from_search:
+            shortest_path.append(key)
+    else:
+        shortest_path = None
+
+    return came_from_search, shortest_path
+
+
+graph = {'A':['B'],'B':['A','C'],'C':['B']}
+
+graph2 = {(1, 1): [(2, 1), (1, 2)],
+          (1, 2): [(1, 1)],
+          (2, 1): [(1, 1)]}
+
+shortest_path = breadth_first_search(graph, 'B', 'A')
+print(shortest_path)
 
